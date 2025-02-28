@@ -1,0 +1,67 @@
+body {
+    background-color: #f3f4f6;
+    font-family: Arial, sans-serif;
+}
+.aside {
+    width: 160px;
+    /* Thu nhỏ phần .aside */
+    background-color: white;
+    padding: 16px;
+    margin: auto;
+    border-radius: 20px;
+    margin-top: 10px;
+    box-shadow: 5px 5px 4px 6px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    margin-left: 20px;
+    top: 20px;
+
+
+}
+
+.aside ul {
+    list-style: none;
+    padding: 0;
+}
+
+.aside ul li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.icon {
+    display: flex;
+    align-items: center; /* Canh giữa theo chiều dọc */
+    gap: 12px; /* Khoảng cách giữa icon và text */
+    padding: 8px 0;
+}
+
+.icon li {
+    list-style: none;
+}
+
+.icon img {
+    width: 24px; /* Định kích thước icon */
+    height: 24px;
+}
+
+.icon span {
+    font-size: 16px;
+    color: #333;
+    flex-grow: 1; /* Giúp text không bị bó hẹp */
+}
+
+@media (max-width: 768px) {
+
+    .aside {
+        flex-shrink: 0;
+        position: relative;
+        margin-top: 10px;
+    }
+
+    .aside ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+}

@@ -1,0 +1,170 @@
+/* Reset CSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+.container-product {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.product-layout {
+  display: flex;
+  gap: 20px;
+}
+
+.product-images {
+  flex: 1;
+}
+
+.image-main {
+  position: relative;
+  text-align: center;
+  margin-right: 400px;
+  
+}
+
+.image-main img {
+  width: 250px;
+  height: 250px;
+  object-fit: cover; 
+  border-radius: 8px;
+}
+
+.image-button {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.back-button {
+  background: #fff; /* Màu nền */
+  color: #004d40; /* Màu chữ */
+  border: none; /* Không có viền */
+  padding: 10px 15px; /* Khoảng cách bên trong */
+  border-radius: 5px; /* Bo góc */
+  cursor: pointer; /* Con trỏ chuột */
+  font-size: 16px; /* Kích thước chữ */
+  margin-bottom: 20px; /* Khoảng cách dưới */
+  transition: background 0.3s; /* Hiệu ứng chuyển màu */
+  width: 150px;
+  height: 50px;
+}
+
+.back-button:hover {
+  background: #c0c0c0; /* Màu nền khi hover */
+}
+
+.image-thumbnails {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 10px;
+  margin-right: 400px;
+}
+
+.image-thumbnails img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.image-thumbnails img:hover {
+  transform: scale(1.1);
+}
+
+.product-details{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 300px;
+}
+
+.capacity-info,
+.color-infor {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: gray;
+  margin-left: 10px;
+}
+
+.capacity-options h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.color-options h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.purchase-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.purchase-buttons button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+}
+
+.buy-now {
+  background: #d0021b;
+  color: #fff;
+}
+
+.buy-now:hover {
+  background: #b00018;
+}
+
+.add-to-cart {
+  background: #f0c040;
+}
+
+.add-to-cart:hover {
+  background: #e0b030;
+}

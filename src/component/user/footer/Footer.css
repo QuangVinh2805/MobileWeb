@@ -1,0 +1,78 @@
+
+.container {
+    max-width: 100%; /* Giữ nguyên chiều rộng tối đa */
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #004d40;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex; /* Thay đổi thành flex */
+    flex-wrap: wrap; /* Cho phép các phần tử xếp hàng */
+    justify-content: space-between; /* Căn giữa các phần tử */
+}
+
+.grid {
+    display: flex; /* Thay đổi từ grid sang flex */
+    flex-wrap: wrap; /* Cho phép các phần tử xếp hàng */
+    gap: 20px; /* Khoảng cách giữa các phần tử */
+    width: 100%; /* Đảm bảo grid chiếm toàn bộ chiều rộng */
+    margin-bottom: 30px;
+}
+
+.grid > div {
+    flex: 1; /* Các phần tử trong grid sẽ có chiều rộng bằng nhau */
+    min-width: 200px; /* Chiều rộng tối thiểu cho mỗi phần tử */
+    display: flex; /* Thay đổi thành flex */
+    flex-direction: column; /* Đặt hướng xếp cột */
+    align-items: flex-start; /* Căn chỉnh các phần tử bên trái */
+}
+
+h3 {
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin-left: 5px;
+}
+
+ul li {
+    margin-bottom: 8px;
+}
+.payment-container,
+.transport-container {
+    display: flex;
+    align-items: center; 
+    gap: 8px; 
+}
+.payment-methods img,
+.shipping-methods img {
+    width: 90%;
+    height: 90%;
+}
+.contact-container{
+    margin-left: 20px;
+}
+.contact-info {
+    background-color: white;
+    color: #004d40;
+    font-weight: bold;
+    text-align: center;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+.social-icons i {
+    font-size: 24px;
+    margin-right: 8px;
+}
+
+.footer-bottom {
+    text-align: center;
+    font-size: 14px;
+    margin-top:24px;
+    margin: auto;
+}
