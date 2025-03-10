@@ -39,10 +39,9 @@
 }
 
 .image-main img {
-  width: 250px;
   height: 250px;
-  object-fit: cover; 
   border-radius: 8px;
+  object-fit: cover;
 }
 
 .image-button {
@@ -85,7 +84,6 @@
 .image-thumbnails img {
   width: 60px;
   height: 60px;
-  object-fit: cover;
   border-radius: 8px;
   cursor: pointer;
   transition: transform 0.2s ease-in-out;

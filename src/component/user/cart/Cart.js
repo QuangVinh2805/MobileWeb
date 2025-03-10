@@ -4,7 +4,7 @@ import './Cart.css';
 import Header from '../header/Header';
 import Footer from '../footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -12,20 +12,44 @@ const Cart = () => {
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    setCartItems(storedCart);
+    // Đảm bảo mỗi sản phẩm có quantity ít nhất là 1
+    const updatedCart = storedCart.map(item => ({
+      ...item,
+      quantity: item.quantity || 1,
+    }));
+    setCartItems(updatedCart);
   }, []);
+
+  const updateCart = (updatedCart) => {
+    setCartItems(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+  };
+
+  const increaseQuantity = (index) => {
+    const updatedCart = [...cartItems];
+    updatedCart[index].quantity += 1;
+    updateCart(updatedCart);
+  };
+
+  const decreaseQuantity = (index) => {
+    const updatedCart = [...cartItems];
+    if (updatedCart[index].quantity > 1) {
+      updatedCart[index].quantity -= 1;
+      updateCart(updatedCart);
+    } else {
+      removeItem(index);
+    }
+  };
 
   const removeItem = (index) => {
     const updatedCart = cartItems.filter((_, i) => i !== index);
-    setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    updateCart(updatedCart);
   };
 
   const clearCart = () => {
     setCartItems([]);
     localStorage.removeItem('cart');
   };
-  
 
   return (
     <div>
@@ -45,6 +69,17 @@ const Cart = () => {
                     <p className="cart-price">{item.price}</p>
                     <p className="cart-color">Màu: {item.color}</p>
                     <p className="cart-capacity">Phiên bản: {item.capacity}</p>
+                    
+                    <div className="quantity-controls">
+                      <button className="quantity-button" onClick={() => decreaseQuantity(index)}>
+                        <FontAwesomeIcon icon={faMinus} />
+                      </button>
+                      <span className="quantity">{item.quantity}</span>
+                      <button className="quantity-button" onClick={() => increaseQuantity(index)}>
+                        <FontAwesomeIcon icon={faPlus} />
+                      </button>
+                    </div>
+
                     <button className="remove-button" onClick={() => removeItem(index)}>
                       <FontAwesomeIcon icon={faTrash} /> Xóa
                     </button>
