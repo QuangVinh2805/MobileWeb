@@ -1,0 +1,24 @@
+.admin-container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 250px; /* Sidebar có chiều rộng cố định */
+    background-color: #343a40;
+    color: white;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh; /* Chiều cao full màn hình */
+    overflow-y: auto;
+}
+
+.admin-content {
+    flex-grow: 1;
+    margin-left: 250px; /* Để nội dung không bị che bởi Sidebar */
+    padding: 20px;
+    overflow-y: auto; /* Cho phép cuộn nếu nội dung dài */
+    width: calc(100% - 250px); /* Đảm bảo không bị chồng lên nhau */
+}

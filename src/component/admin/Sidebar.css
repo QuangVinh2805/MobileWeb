@@ -1,0 +1,38 @@
+.sidebar {
+    width: 250px; /* Độ rộng sidebar */
+    height: 100vh; /* Chiều cao 100% màn hình */
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #343a40;
+    padding: 20px;
+}
+
+.sidebar ul {
+    padding: 0;
+}
+
+.sidebar li {
+    list-style: none;
+    padding: 10px 0;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    transition: background 0.3s;
+}
+
+.sidebar a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+.logo{
+    color: #38b2ac;
+    font-style: italic;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 50px;
+    margin:auto;
+    text-align: center;
+}

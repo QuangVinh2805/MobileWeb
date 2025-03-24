@@ -40,7 +40,7 @@ const Login = () => {
 
             // Điều hướng đến trang phù hợp
             if (data.roleId === 1) {
-                navigate("/admin");
+                navigate("/admin/manageProduct");
             } else {
                 const redirectUrl = localStorage.getItem("redirectAfterLogin");
                 if (redirectUrl) {
