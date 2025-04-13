@@ -16,7 +16,7 @@ main {
 }
 
 
-.product-list {
+.home-product-list {
     display: flex;
     gap: 12px;
     margin-top: 16px;
@@ -24,7 +24,7 @@ main {
 
 }
 
-.product-item {
+.home-product-item {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -37,40 +37,40 @@ main {
     position: relative;
 }
 
-.product-item .image {
+.home-product-item .home-image {
     display: flex;
 }
 
-.product-item img {
+.home-product-item img {
     height: 100px;
     object-fit: cover;
     border-radius: 8px;
     margin-right: 150px;
 }
 
-.product-item .info {
+.home-product-item .info {
     width: 100%;
     text-align: center;
     margin-top: 8px;
 }
 
-.product-item .name {
+.home-product-item .name {
     color: #e53e3e;
     font-weight: bold;
     font-size: 14px;
 }
 
-.product-item .price {
+.home-product-item .price {
     font-size: 14px;
     color: #333;
     font-weight: bold;
 }
 
-.product-item p {
+.home-product-item p {
     margin: 8px 0;
 }
 
-.product-item .specifications {
+.home-product-item .home-specifications {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -81,13 +81,13 @@ main {
     color: #555;
 }
 
-.specifications p {
+.home-specifications p {
     display: flex;
     align-items: center;
     margin: 3px 0;
 }
 
-.specifications svg {
+.home-specifications svg {
     font-size: 14px;
     margin-right: 5px;
     color: #38b2ac;
@@ -109,7 +109,7 @@ main {
 
 /* Responsive styles */
 @media (max-width: 1200px) {
-    .product-item {
+    .home-product-item {
         width: calc(33.33% - 20px);
         /* 3 sản phẩm trên mỗi hàng */
     }
@@ -126,14 +126,14 @@ main {
         width: 100%;
     }
 
-    .product-list {
+    .home-product-list {
         grid-template-columns: 1fr;
         flex-wrap: wrap;
         justify-content: center;
 
     }
 
-    .product-item {
+    .home-product-item {
         margin: 10px;
         width: calc(50% - 20px);
     }
@@ -146,7 +146,7 @@ main {
 }
 
 @media (max-width: 480px) {
-    .product-item {
+    .home-product-item {
         width: calc(100% - 20px);
         /* 1 sản phẩm trên mỗi hàng */
     }

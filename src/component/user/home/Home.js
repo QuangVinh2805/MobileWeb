@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import './Home.css';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -7,19 +6,32 @@ import Category from '../category/Category';
 import Banner from '../banner/Banner';
 import Footer from '../footer/Footer';
 import { useNavigate } from 'react-router-dom';
-import { FaMicrochip, FaBatteryFull, FaMemory } from 'react-icons/fa';
+import { FaMicrochip, FaBatteryFull, FaMemory, FaEyeSlash, FaEye } from 'react-icons/fa';
 
 const Home = () => {
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
 
-    useEffect(() => {
+    const fetchProducts = () => {
         fetch('http://localhost:8520/product/all')
-            .then((response) => response.json())
-            .then((data) => {
-                setProducts(data);
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
             })
-            .catch((error) => console.error('Lỗi khi tải sản phẩm:', error));
+            .then((data) => {
+                setProducts(data || []); // Ensure products is always an array
+            })
+            .catch((error) => {
+                console.error('Lỗi khi tải sản phẩm:', error);
+                setProducts([]); // Set to empty array on error
+            });
+    };
+
+
+    useEffect(() => {
+        fetchProducts(); // Gọi API để lấy danh sách sản phẩm khi component được render
     }, []);
 
     const handleProductClick = async (product) => {
@@ -35,7 +47,7 @@ const Home = () => {
                 selectedColor = colors[0].color; // Lấy tên màu
 
                 // Gọi API lấy danh sách hình ảnh theo màu đầu tiên
-                const imageResponse = await fetch(`http://localhost:8520/product/image/allImage?product_id=${product.id}&color=${selectedColor}`); // Sửa tham số ở đây
+                const imageResponse = await fetch(`http://localhost:8520/product/image/allImage?product_id=${product.id}&color=${selectedColor}`);
                 images = await imageResponse.json();
             }
 
@@ -45,7 +57,7 @@ const Home = () => {
             const selectedCapacity = capacities.length > 0 ? capacities[0] : null;
 
             // Chuyển sang trang Product với dữ liệu đã xử lý
-            navigate(`/product/${product.id}`, {
+            navigate(`/product_detail/${product.id}`, {
                 state: {
                     product,
                     colors,
@@ -60,38 +72,39 @@ const Home = () => {
         }
     };
 
-
     return (
         <div>
             <Header />
             <div className="main-content">
                 <Category />
                 <main>
-                    <Banner />
-                    <div className="product-list">
-                        {products.map((product) => (
-                            <div className="product-item" key={product.id} onClick={() => handleProductClick(product)}>
-                                <div className="image">
-                                    <img src={product.avatar} alt={product.productName} />
+                    <Banner/>
+                    <div className="home-product-list">
+                        {Array.isArray(products) && products
+                            .filter((product) => product.status === 1)
+                            .map((product) => (
+                                <div className="home-product-item" key={product.id} onClick={() => handleProductClick(product)}>
+                                    <div className="home-image">
+                                        <img src={product.avatar} alt={product.productName} />
+                                    </div>
+                                    <div className="home-info">
+                                        <p className="name">{product.productName}</p>
+                                        <p className="price">{`Giá: ${product.price} VNĐ`}</p>
+                                    </div>
+                                    <div className="home-specifications">
+                                        <p><FaMicrochip /> {product.microprocessor}</p>
+                                        <p><FaBatteryFull /> {product.batteryCapacity} mAh</p>
+                                        <p><FaMemory /> {product.ram}</p>
+                                    </div>
                                 </div>
-                                <div className="info">
-                                    <p className="name">{product.productName}</p>
-                                    <p className="price">{`Giá: ${product.price} VNĐ`}</p>
-                                </div>
-                                <div className="specifications">
-                                    <p><FaMicrochip /> {product.microprocessor}</p>
-                                    <p><FaBatteryFull /> {product.batteryCapacity} mAh</p>
-                                    <p><FaMemory /> {product.ram}</p>
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+
                     </div>
                 </main>
             </div>
-            <Footer />
+            <Footer/>
         </div>
     );
 };
 
 export default Home;
-

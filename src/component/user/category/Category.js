@@ -1,52 +1,54 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import './Category.css';
+import { useNavigate } from 'react-router-dom';
 
 const Category = () => {
-    const categorys = [
-        {
-            name: 'Điện thoại',
-            icon: '/assets/images/icon/phone.png',
-        },
-        {
-            name: 'Laptop',
-            icon: '/assets/images/icon/laptop.png',
-        },
-        {
-            name: 'Tablet',
-            icon: '/assets/images/icon/tablet.png',
-        },
-        {
-            name: 'Desktop',
-            icon: '/assets/images/icon/desktop-monitor.png',
-        },
-        {
-            name: 'Phụ kiện',
-            icon: '/assets/images/icon/cogs.png',
-        },
-        {
-            name: 'Âm thanh',
-            icon: '/assets/images/icon/medium-volume.png',
-        },
-        {
-            name: 'Sửa chữa',
-            icon: '/assets/images/icon/tools.png',
-        },
-    ]
+    const [categories, setCategories] = useState([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        axios.get('http://localhost:8520/category/allCategory')
+            .then(response => {
+                setCategories(response.data);
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy dữ liệu category:', error);
+            });
+    }, []);
+
+    const handleCategoryClick = async (category) => {
+        try {
+            const response = await axios.get(`http://localhost:8520/product/byCategory/${category.id}`);
+            const products = response.data;
+            // Navigate đến trang Product.js và truyền state
+            navigate(`/product/${category.id}`, {
+                state: {
+                    category,
+                    products,
+                }
+            });
+        } catch (error) {
+            console.error('Lỗi khi lấy sản phẩm theo category:', error);
+        }
+    };
 
     return (
         <div className='aside'>
             <ul>
-                {categorys.map((category, index) => (
-                    <li key={index} className='icon'>
-                        <img src={category.icon} alt={category.name} />
-                        <span>{category.name}</span>
+                {categories.map((category, index) => (
+                    <li
+                        key={index}
+                        className='icon'
+                        onClick={() => handleCategoryClick(category)}
+                    >
+                        <img src={category.icon} alt={category.categoryName} />
+                        <span>{category.categoryName}</span>
                     </li>
                 ))}
             </ul>
         </div>
-
     );
-
 };
 
 export default Category;

@@ -10,15 +10,21 @@ import ManageProduct from "./component/admin/ProductManagement";
 import ManageUser from "./component/admin/UserManagement";
 import Sidebar from "./component/admin/Sidebar";
 import AdminLayout from "./AdminLayout";
+import Product_Detail from "./component/user/product_detail/Product_Detail"
+import Product_Category from "./component/user/product_category/Product_Category"
+import Order from "./component/user/order/Order"
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/product/:id" element={<Product />} />
-        <Route path="/cart" element={<Cart />} />
+          <Route path="/product_detail/:id" element={<Product_Detail />} />
+          <Route path="/product/:categoryId" element={<Product />} />
+          <Route path="/product_category/:categoryDetailId" element={<Product_Category />} />
+          <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order" element={<Order />} />
           <Route path="/login" element={<Login/> } />
           <Route path="/register" element={<Register/> } />
         {/* Trang quản trị */}

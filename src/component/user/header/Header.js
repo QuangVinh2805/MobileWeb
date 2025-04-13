@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './Header.css';
 import { useNavigate } from 'react-router-dom';
-import { FaUserCircle, FaShoppingCart } from 'react-icons/fa';
+import { FaUserCircle, FaShoppingCart, FaClipboardList } from 'react-icons/fa';
+
 
 const Header = () => {
     const navigate = useNavigate();
@@ -24,6 +25,10 @@ const Header = () => {
     const goToHome = () => {
         navigate('/');
     };
+    const goToOrder = () => {
+        navigate('/order');
+    };
+
 
     const handleProfileClick = () => {
         navigate(user ? '/profile' : '/login');
@@ -63,19 +68,30 @@ const Header = () => {
                                     style={{cursor: 'pointer', marginRight: '20px'}}
                                     onClick={handleProfileClick}
                                 />
+                                <FaClipboardList
+                                    size={24}
+                                    style={{cursor: 'pointer', marginRight: '20px'}}
+                                    onClick={goToOrder}
+                                    title="Đơn hàng"
+                                />
                                 <FaShoppingCart
                                     size={24}
                                     style={{cursor: 'pointer'}}
                                     onClick={goToCart}
                                 />
-                                <button onClick={handleLogout} className='logout' style={{
-                                    width:'100px',
-                                    borderRadius: '5px',
-                                    color: '#ffffff',
-                                    background: '#38b2ac',
-                                    marginLeft: '20px',
-                                    border: 'solid #38b2ac'
-                                }}>Đăng xuất
+                                <button
+                                    onClick={handleLogout}
+                                    className="logout"
+                                    style={{
+                                        width: '100px',
+                                        borderRadius: '5px',
+                                        color: '#ffffff',
+                                        background: '#38b2ac',
+                                        marginLeft: '20px',
+                                        border: 'solid #38b2ac'
+                                    }}
+                                >
+                                    Đăng xuất
                                 </button>
                             </>
                         ) : (

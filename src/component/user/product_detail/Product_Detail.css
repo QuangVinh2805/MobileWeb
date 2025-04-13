@@ -1,0 +1,222 @@
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+.container-product {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.product-detail-product-layout {
+    display: flex;
+    gap: 20px;
+}
+
+.product-detail-product-images {
+    flex: 1;
+}
+
+.product-detail-image-main {
+    position: relative;
+    text-align: center;
+}
+
+.product-detail-image-main img {
+    height: 250px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.product-detail-image-thumbnails {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.product-detail-image-thumbnails img {
+    height: 70px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    object-fit: cover;
+}
+
+.product-detail-image-thumbnails img:hover {
+    transform: scale(1.1);
+}
+
+.product-detail-product-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 300px;
+}
+
+.product-detail-price-info {
+    font-size: 20px;
+    font-weight: bold;
+    color: #d0021b;
+    font-size: 40px;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: gray;
+    margin-left: 10px;
+}
+
+.product-detail-color-options h2,
+.product-detail-capacity-options h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.product-detail-color-buttons button,
+.product-detail-capacity-buttons button {
+    border: none; /* Không có viền */
+    border-radius: 5px; /* Bo góc */
+    cursor: pointer; /* Con trỏ chuột */
+    margin-right: 10px; /* Khoảng cách giữa các nút */
+    transition: background 0.3s; /* Hiệu ứng chuyển màu */
+    text-transform: capitalize;
+}
+
+.product-detail-color-buttons button.selected,
+.product-detail-capacity-buttons button.selected {
+    border: 2px solid #000;
+}
+
+.product-detail-color-buttons button {
+    background-color: #f0f0f0; /* Màu nền mặc định */
+    width: 100px;
+    height: 50px;
+}
+
+.product-detail-capacity-buttons button {
+    background-color: #e0e0e0; /* Màu nền mặc định */
+    width: 100px;
+    height: 50px;
+}
+
+/* Thay đổi màu nền khi hover */
+.product-detail-color-buttons button:hover,
+.product-detail-capacity-buttons button:hover {
+    background-color: #d0d0d0; /* Màu nền khi hover */
+}
+
+.product-detail-feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+}
+
+/* Thêm lớp cho phần chứa nút mua hàng và thêm giỏ hàng */
+.product-detail-purchase-buttons {
+    display: flex; /* Sử dụng Flexbox */
+    gap: 10px; /* Khoảng cách giữa các nút */
+}
+
+.product-detail-purchase-buttons button {
+    flex: 1; /* Chiếm đều không gian */
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+}
+
+.buy-now {
+    background: #d0021b;
+    color: #fff;
+    border: none;
+    width: 150px;
+    height: 50px;
+    border-radius: 10px;
+}
+
+.buy-now:hover {
+    background: #b00018;
+}
+
+.add-to-cart {
+    background: #004d40;
+    color: #ffffff;
+    border: none;
+    width: 150px;
+    height: 50px;
+    border-radius: 10px;
+}
+
+.add-to-cart:hover {
+    background: #004338;
+}
+
+.product-detail-back-button {
+    background: #fff; /* Màu nền */
+    color: #004d40; /* Màu chữ */
+    border: none; /* Không có viền */
+    padding: 10px 15px; /* Khoảng cách bên trong */
+    border-radius: 5px; /* Bo góc */
+    cursor: pointer; /* Con trỏ chuột */
+    font-size: 16px; /* Kích thước chữ */
+    margin-bottom: 20px; /* Khoảng cách dưới */
+    transition: background 0.3s; /* Hiệu ứng chuyển màu */
+    width: 150px;
+    height: 50px;
+}
+
+.product-detail-back-button:hover {
+    background: #c0c0c0; /* Màu nền khi hover */
+}
+.product-detail-product-specifications {
+    margin-top: 20px; /* Khoảng cách trên */
+    padding: 15px; /* Khoảng cách bên trong */
+    background-color: #f9f9f9; /* Màu nền */
+    border: 1px solid #ddd; /* Viền xung quanh */
+    border-radius: 8px; /* Bo góc */
+}
+
+.product-detail-product-specifications h2 {
+    font-size: 20px; /* Kích thước chữ tiêu đề */
+    margin-bottom: 10px; /* Khoảng cách dưới tiêu đề */
+}
+
+.product-detail-product-specifications ul {
+    list-style-type: none; /* Không hiển thị dấu chấm */
+    padding-left: 0; /* Bỏ padding bên trái */
+    text-transform: capitalize;
+}
+
+.product-detail-product-specifications li {
+    margin-bottom: 8px; /* Khoảng cách giữa các mục */
+    font-size: 16px; /* Kích thước chữ cho các mục */
+    text-transform: capitalize;
+}
+
+.product-detail-product-specifications strong {
+    color: #333; /* Màu chữ cho nhãn */
+}
