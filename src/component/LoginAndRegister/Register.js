@@ -114,7 +114,7 @@ const Register = () => {
         <div className="register-container">
 
             <div className="register-form-container">
-                <h1 className='NameStoreLogin' onClick={goToHome}>VPhone</h1>
+                <h1 className='NameStoreRegister' onClick={goToHome}>VPhone</h1>
                 <h2>Tạo tài khoản</h2>
                 <p className="info-message">Mật khẩu của bạn sẽ được tạo tự động và gửi qua email.</p>
                 <form onSubmit={handleSubmit}>

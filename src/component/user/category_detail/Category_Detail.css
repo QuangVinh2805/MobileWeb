@@ -1,59 +1,36 @@
-body {
-    background-color: #f3f4f6;
-    font-family: Arial, sans-serif;
-}
 .aside-category-detail {
-    width: 150px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     background-color: white;
-    padding: 16px;
-    border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 20px;
-
-    align-self: flex-start;
+    padding: 12px 16px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
 }
-
 
 .aside-category-detail ul {
     list-style: none;
     padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .aside-category-detail ul li {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-}
-.icon {
-    display: flex;
-    align-items: center; /* Canh giữa theo chiều dọc */
-    gap: 12px; /* Khoảng cách giữa icon và text */
-    padding: 8px 0;
+    padding: 6px 12px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-.icon li {
-    list-style: none;
-}
-
-
-.icon span {
-    font-size: 16px;
-    color: #333;
-    flex-grow: 1; /* Giúp text không bị bó hẹp */
-}
-
-@media (max-width: 768px) {
-
-    .aside-category-detail {
-        width: 100%;
-        position: relative;
-    }
-
-    .aside-category-detail ul {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
+.aside-category-detail ul li:hover {
+    background-color: #e0e0e0;
 }

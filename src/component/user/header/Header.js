@@ -21,6 +21,9 @@ const Header = () => {
     const goToCart = () => {
         navigate('/cart');
     };
+    const goToProfile = () => {
+        navigate('/profile');
+    };
 
     const goToHome = () => {
         navigate('/');
@@ -66,7 +69,7 @@ const Header = () => {
                                 <FaUserCircle
                                     size={24}
                                     style={{cursor: 'pointer', marginRight: '20px'}}
-                                    onClick={handleProfileClick}
+                                    onClick={goToProfile}
                                 />
                                 <FaClipboardList
                                     size={24}

@@ -20,6 +20,7 @@
     padding-right: 20px; /* Thêm khoảng cách giữa thông tin và sản phẩm */
     display: flex;
     flex-direction: column; /* Sắp xếp các phần tử trong .order-info theo chiều dọc */
+
 }
 
 .order-product {
@@ -57,3 +58,51 @@
 .cancel-order-btn:hover {
     background-color: #d9363e;
 }
+@media (max-width: 992px) {
+    .order-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .order-product {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .order-product-image {
+        width: 100%;
+        max-width: 200px;
+        margin-bottom: 10px;
+    }
+
+    .order-product-info {
+        width: 100%;
+    }
+
+    .cancel-order-btn {
+        width: 100%;
+        max-width: 150px;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    .order-container {
+        padding: 10px;
+    }
+
+    .order-card {
+        padding: 12px;
+    }
+
+    .order-product-image {
+        max-width: 150px;
+    }
+
+    .cancel-order-btn {
+        height: 45px;
+        font-size: 14px;
+    }
+}
+

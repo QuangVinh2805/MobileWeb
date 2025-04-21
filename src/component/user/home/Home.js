@@ -6,39 +6,37 @@ import Category from '../category/Category';
 import Banner from '../banner/Banner';
 import Footer from '../footer/Footer';
 import { useNavigate } from 'react-router-dom';
-import { FaMicrochip, FaBatteryFull, FaMemory, FaEyeSlash, FaEye } from 'react-icons/fa';
+import { FaMicrochip, FaBatteryFull, FaMemory } from 'react-icons/fa';
+import axiosClient from '../../api/api';
 
 const Home = () => {
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
 
+    // Hàm lấy sản phẩm từ API
     const fetchProducts = () => {
-        fetch('http://localhost:8520/product/all')
+        axiosClient.get('/product/all') 
             .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data) => {
-                setProducts(data || []); // Ensure products is always an array
+                setProducts(response.data || []); // Cập nhật dữ liệu sản phẩm
             })
             .catch((error) => {
                 console.error('Lỗi khi tải sản phẩm:', error);
-                setProducts([]); // Set to empty array on error
+                setProducts([]); // Set empty array nếu có lỗi
             });
     };
-
 
     useEffect(() => {
         fetchProducts(); // Gọi API để lấy danh sách sản phẩm khi component được render
     }, []);
 
+    // Hàm xử lý click vào sản phẩm
     const handleProductClick = async (product) => {
         try {
             // Gọi API lấy danh sách màu sắc của sản phẩm
-            const colorResponse = await fetch(`http://localhost:8520/product/image/colors?productId=${product.id}`);
-            const colors = await colorResponse.json();
+            const colorResponse = await axiosClient.get(`/product/image/colors`, {
+                params: { productId: product.id }
+            });
+            const colors = colorResponse.data;
 
             let selectedColor = null;
             let images = [];
@@ -47,13 +45,17 @@ const Home = () => {
                 selectedColor = colors[0].color; // Lấy tên màu
 
                 // Gọi API lấy danh sách hình ảnh theo màu đầu tiên
-                const imageResponse = await fetch(`http://localhost:8520/product/image/allImage?product_id=${product.id}&color=${selectedColor}`);
-                images = await imageResponse.json();
+                const imageResponse = await axiosClient.get(`/product/image/allImage`, {
+                    params: { product_id: product.id, color: selectedColor }
+                });
+                images = imageResponse.data;
             }
 
             // Gọi API lấy danh sách dung lượng
-            const capacityResponse = await fetch(`http://localhost:8520/product/capacity?productId=${product.id}`);
-            const capacities = await capacityResponse.json();
+            const capacityResponse = await axiosClient.get(`/product/capacity`, {
+                params: { productId: product.id }
+            });
+            const capacities = capacityResponse.data;
             const selectedCapacity = capacities.length > 0 ? capacities[0] : null;
 
             // Chuyển sang trang Product với dữ liệu đã xử lý
@@ -78,7 +80,8 @@ const Home = () => {
             <div className="main-content">
                 <Category />
                 <main>
-                    <Banner/>
+                    <Banner />
+                    <div className="home-product">
                     <div className="home-product-list">
                         {Array.isArray(products) && products
                             .filter((product) => product.status === 1)
@@ -98,11 +101,11 @@ const Home = () => {
                                     </div>
                                 </div>
                             ))}
-
+                    </div>
                     </div>
                 </main>
             </div>
-            <Footer/>
+            <Footer />
         </div>
     );
 };

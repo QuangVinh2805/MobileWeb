@@ -15,17 +15,12 @@ const Product = () => {
         <div>
             <Header/>
         <div className="product-product-page">
-            <Category_Detail />
             <div className="product-content-right">
 
             {/* Nút quay lại */}
             <button className="product-back-button" onClick={() => navigate(-1)}>
                 ← Quay lại
             </button>
-
-            <h2 className="product-category-title">
-                Sản phẩm thuộc danh mục: {category?.categoryName}
-            </h2>
 
             <div className="product-product-list">
                 {Array.isArray(products) && products.length > 0 ? (
@@ -59,6 +54,7 @@ const Product = () => {
             </div>
             </div>
         </div>
+            <Category_Detail />
             <Footer/>
         </div>
     );

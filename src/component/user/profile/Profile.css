@@ -1,0 +1,99 @@
+/* Giao diện chính */
+.profile-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-container h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 26px;
+    color: #333;
+}
+
+/* Form */
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.profile-form label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+    color: #444;
+}
+
+.profile-form input {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-top: 5px;
+    transition: border-color 0.3s ease;
+}
+
+.profile-form input:focus {
+    border-color: #38b2ac;
+    outline: none;
+}
+
+.profile-form button {
+    padding: 12px;
+    background-color: #38b2ac;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.profile-form button:hover {
+    background-color: #004d40;
+}
+
+/* Responsive: Màn hình nhỏ hơn 768px (tablet, mobile) */
+@media (max-width: 768px) {
+    .profile-container {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .profile-container h1 {
+        font-size: 22px;
+    }
+
+    .profile-form input,
+    .profile-form button {
+        font-size: 15px;
+        padding: 10px;
+    }
+}
+
+/* Responsive: Màn hình rất nhỏ (dưới 480px) */
+@media (max-width: 480px) {
+    .profile-container {
+        padding: 15px;
+    }
+
+    .profile-container h1 {
+        font-size: 20px;
+    }
+
+    .profile-form input {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .profile-form button {
+        font-size: 14px;
+        padding: 10px;
+    }
+}

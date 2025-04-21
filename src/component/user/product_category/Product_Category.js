@@ -4,6 +4,7 @@ import './Product_Category.css';
 import { FaMicrochip, FaBatteryFull, FaMemory } from 'react-icons/fa';
 import Footer from '../footer/Footer';
 import Header from '../header/Header';
+import axiosClient from '../../api/api';
 
 const Product_Category = () => {
     const { categoryDetailId } = useParams();
@@ -14,21 +15,20 @@ const Product_Category = () => {
     const categoryDetailName = location.state?.categoryDetailName || '';
 
     useEffect(() => {
-        fetch(`http://localhost:8520/product/byCategoryDetail/${categoryDetailId}`)
-            .then(response => response.json())
-            .then(data => {
-                setProducts(data || []);
+        axiosClient.get(`/product/byCategoryDetail/${categoryDetailId}`)
+            .then(response => {
+                setProducts(response.data || []);
             })
             .catch(error => {
                 console.error('Lỗi khi lấy sản phẩm theo category detail:', error);
-                setProducts([]);
+                setProducts([]); // Set to empty array on error
             });
     }, [categoryDetailId]);
 
     const handleProductClick = async (product) => {
         try {
-            const colorResponse = await fetch(`http://localhost:8520/product/image/colors?productId=${product.id}`);
-            const colors = await colorResponse.json();
+            const colorResponse = await axiosClient.get(`/product/image/colors?productId=${product.id}`);
+            const colors = colorResponse.data;
 
             let selectedColor = null;
             let images = [];
@@ -36,12 +36,12 @@ const Product_Category = () => {
             if (colors.length > 0) {
                 selectedColor = colors[0].color;
 
-                const imageResponse = await fetch(`http://localhost:8520/product/image/allImage?product_id=${product.id}&color=${selectedColor}`);
-                images = await imageResponse.json();
+                const imageResponse = await axiosClient.get(`/product/image/allImage?product_id=${product.id}&color=${selectedColor}`);
+                images = imageResponse.data;
             }
 
-            const capacityResponse = await fetch(`http://localhost:8520/product/capacity?productId=${product.id}`);
-            const capacities = await capacityResponse.json();
+            const capacityResponse = await axiosClient.get(`/product/capacity?productId=${product.id}`);
+            const capacities = capacityResponse.data;
             const selectedCapacity = capacities.length > 0 ? capacities[0] : null;
 
             navigate(`/product_detail/${product.id}`, {
@@ -66,34 +66,36 @@ const Product_Category = () => {
     return (
         <div>
             <Header/>
-        <div className="product-cate-product-page">
+            <div className="buton">
             <button className="product-cate-back-button" onClick={handleBack}>← Quay lại</button>
-            <h2 className="product-cate-category-title">Sản phẩm thuộc danh mục chi tiết: {categoryDetailName}</h2>
-            <div className="product-cate-product-list">
-                {Array.isArray(products) && products.length > 0 ? (
-                    products
-                        .filter(p => p.status === 1)
-                        .map((product) => (
-                            <div className="product-cate-product-item" key={product.id} onClick={() => handleProductClick(product)}>
-                                <div className="product-cate-image">
-                                    <img src={product.avatar} alt={product.productName} />
-                                </div>
-                                <div className="product-cate-info">
-                                    <p className="name">{product.productName}</p>
-                                    <p className="price">Giá: {product.price} VNĐ</p>
-                                </div>
-                                <div className="product-cate-specifications">
-                                    <p><FaMicrochip /> {product.microprocessor}</p>
-                                    <p><FaBatteryFull /> {product.batteryCapacity} mAh</p>
-                                    <p><FaMemory /> {product.ram}</p>
-                                </div>
-                            </div>
-                        ))
-                ) : (
-                    <p>Không có sản phẩm nào trong danh mục này.</p>
-                )}
             </div>
-        </div>
+            <div className="product-cate-product-page">
+                <div className="product-cate-product-list">
+                    {Array.isArray(products) && products.length > 0 ? (
+                        products
+                            .filter(p => p.status === 1)
+                            .map((product) => (
+                                <div className="product-cate-product-item" key={product.id}
+                                     onClick={() => handleProductClick(product)}>
+                                    <div className="product-cate-image">
+                                        <img src={product.avatar} alt={product.productName}/>
+                                    </div>
+                                    <div className="product-cate-info">
+                                        <p className="name">{product.productName}</p>
+                                        <p className="price">Giá: {product.price} VNĐ</p>
+                                    </div>
+                                    <div className="product-cate-specifications">
+                                        <p><FaMicrochip/> {product.microprocessor}</p>
+                                        <p><FaBatteryFull/> {product.batteryCapacity} mAh</p>
+                                        <p><FaMemory/> {product.ram}</p>
+                                    </div>
+                                </div>
+                            ))
+                    ) : (
+                        <p>Không có sản phẩm nào trong danh mục này.</p>
+                    )}
+                </div>
+            </div>
             <Footer/>
         </div>
     );

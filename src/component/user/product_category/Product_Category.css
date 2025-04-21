@@ -1,37 +1,41 @@
 .product-cate-product-page {
     display: flex;
+    flex-direction: column;
     gap: 24px;
     padding: 20px;
-    flex-direction: column;
-    margin-left: 80px;
+    align-items: center; /* căn giữa nội dung bên trong */
 }
-
+.buton{
+    margin-top: 20px;
+}
 .product-cate-category-title {
     font-size: 24px;
     margin-bottom: 20px;
 }
 
 .product-cate-product-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* mặc định 3 sản phẩm mỗi hàng */
+    gap: 16px;
+    width: 100%;
+    max-width: 1100px; /* căn giữa toàn khối list */
+    justify-content: start; /* luôn bắt đầu từ trái */
 }
 
 /* Giao diện sản phẩm */
 .product-cate-product-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     background-color: white;
     padding: 12px;
     border-radius: 8px;
     box-shadow: 5px 5px 4px 6px rgba(0, 0, 0, 0.1);
-    width: 20%;
-    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     position: relative;
     transition: box-shadow 0.3s ease;
+    height: 300px;
 }
+
 
 .product-cate-product-item:hover {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -116,24 +120,29 @@
 
 /* Responsive giống product.css */
 @media (max-width: 1200px) {
-    .product-cate-product-item {
-        width: calc(33.33% - 20px);
+    .product-cate-product-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .product-cate-product-list {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 700px;
     }
 }
 
 @media (max-width: 768px) {
     .product-cate-product-list {
-        justify-content: center;
-    }
-
-    .product-cate-product-item {
-        margin: 10px;
-        width: calc(50% - 20px);
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        max-width: 600px;
     }
 }
 
 @media (max-width: 480px) {
-    .product-cate-product-item {
-        width: calc(100% - 20px);
+    .product-cate-product-list {
+        grid-template-columns: 1fr;
+        max-width: 320px;
     }
 }

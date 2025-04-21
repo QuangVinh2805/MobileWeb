@@ -13,12 +13,14 @@ import AdminLayout from "./AdminLayout";
 import Product_Detail from "./component/user/product_detail/Product_Detail"
 import Product_Category from "./component/user/product_category/Product_Category"
 import Order from "./component/user/order/Order"
+import Profile from "./component/user/profile/Profile"
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/product_detail/:id" element={<Product_Detail />} />
           <Route path="/product/:categoryId" element={<Product />} />
           <Route path="/product_category/:categoryDetailId" element={<Product_Category />} />

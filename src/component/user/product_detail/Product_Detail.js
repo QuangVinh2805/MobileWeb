@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosClient from '../../api/api';
 import './Product_Detail.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -16,12 +16,10 @@ import Footer from '../footer/Footer';
 const Product = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { product, colors = [], images = [], selectedColor } =
-    location.state || {};
+    const { product, colors = [], images = [], selectedColor } = location.state || {};
 
-    const [selectedImage, setSelectedImage] = useState(
-        images.length > 0 ? images[0].image : ''
-    );
+    // STATES
+    const [selectedImage, setSelectedImage] = useState(images.length > 0 ? images[0].image : '');
     const [availableColors, setAvailableColors] = useState(colors);
     const [currentColor, setCurrentColor] = useState(selectedColor);
     const [imageList, setImageList] = useState(images);
@@ -30,34 +28,18 @@ const Product = () => {
     const [price, setPrice] = useState(null);
     const [productDetails, setProductDetails] = useState(null);
     const [productPriceId, setProductPriceId] = useState(null);
+    const [loading, setLoading] = useState(true);
+    
 
-
-    useEffect(() => {
-        if (product) {
-            if (availableColors.length === 0) {
-                fetchColors(product.id);
-            }
-            fetchCapacities(product.id);
-            fetchProductDetails(product.id);
-        }
-    }, [product]);
-
-    const fetchProductDetails = async (productId) => {
-        try {
-            const response = await axios.get(
-                `http://localhost:8520/product/detail?productId=${productId}`
-            );
-            setProductDetails(response.data);
-        } catch (error) {
-            console.error('Lỗi khi lấy thông số chi tiết sản phẩm:', error);
-        }
+    // FUNCTIONS
+    const formatText = (text) => {
+        if (!text) return "";
+        return text.replace(/\\r\\n|\\n|\\r/g, "<br />");
     };
 
     const fetchColors = async (productId) => {
         try {
-            const response = await axios.get(
-                `http://localhost:8520/product/image/colors?productId=${productId}`
-            );
+            const response = await axiosClient.get(`/product/image/colors?productId=${productId}`);
             const fetchedColors = response.data || [];
             setAvailableColors(fetchedColors);
 
@@ -70,17 +52,9 @@ const Product = () => {
         }
     };
 
-    const handleColorChange = (color) => {
-        setCurrentColor(color);
-        fetchImages(product.id, color);
-        fetchCapacities(product.id, color);
-    };
-
     const fetchImages = async (productId, color) => {
         try {
-            const response = await axios.get(
-                `http://localhost:8520/product/image/allImage?product_id=${productId}&color=${color}`
-            );
+            const response = await axiosClient.get(`/product/image/allImage?product_id=${productId}&color=${color}`);
             const imagesData = response.data || [];
             setImageList(imagesData);
             if (imagesData.length > 0) {
@@ -93,13 +67,13 @@ const Product = () => {
 
     const fetchCapacities = async (productId) => {
         try {
-            const response = await axios.get(
-                `http://localhost:8520/product/capacity?productId=${productId}`
-            );
-            setCapacities(response.data || []);
-            if (response.data.length > 0) {
-                setSelectedCapacity(response.data[0]);
-                fetchPrice(product.id, currentColor, response.data[0]);
+            const response = await axiosClient.get(`/product/capacity?productId=${productId}`);
+            const data = response.data || [];
+            setCapacities(data);
+
+            if (data.length > 0) {
+                setSelectedCapacity(data[0]);
+                fetchPrice(productId, currentColor, data[0]);
             }
         } catch (error) {
             console.error('Lỗi khi lấy danh sách dung lượng:', error);
@@ -108,9 +82,7 @@ const Product = () => {
 
     const fetchPrice = async (productId, color, capacity) => {
         try {
-            const response = await axios.get(
-                `http://localhost:8520/product/price?productId=${productId}&color=${color}&capacity=${capacity}`
-            );
+            const response = await axiosClient.get(`/product/price?productId=${productId}&color=${color}&capacity=${capacity}`);
             if (response.data) {
                 setPrice(response.data.price);
                 setProductPriceId(response.data.productPriceId);
@@ -118,6 +90,24 @@ const Product = () => {
         } catch (error) {
             console.error('Lỗi khi lấy giá sản phẩm:', error);
         }
+    };
+
+    const fetchProductDetails = async (productId) => {
+        try {
+            const response = await axiosClient.get(`/product/detail?productId=${productId}`);
+            setProductDetails(response.data || {});
+        } catch (error) {
+            console.error('Lỗi khi lấy thông số chi tiết sản phẩm:', error);
+            setProductDetails({});
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleColorChange = (color) => {
+        setCurrentColor(color);
+        fetchImages(product.id, color);
+        fetchCapacities(product.id, color);
     };
 
     const handleCapacityChange = (capacity) => {
@@ -139,11 +129,7 @@ const Product = () => {
         }
 
         try {
-            // Lấy productPriceId từ API
-            const response = await axios.get(
-                `http://localhost:8520/product/price?productId=${product.id}&color=${currentColor}&capacity=${selectedCapacity}`
-            );
-
+            const response = await axiosClient.get(`/product/price?productId=${product.id}&color=${currentColor}&capacity=${selectedCapacity}`);
             const productPriceData = response.data;
 
             if (!productPriceData || !productPriceData.id) {
@@ -158,10 +144,7 @@ const Product = () => {
                 quantity: 1,
             };
 
-            const addCartResponse = await axios.post(
-                "http://localhost:8520/cart/create",
-                cartRequest
-            );
+            const addCartResponse = await axiosClient.post("/cart/create", cartRequest);
 
             if (addCartResponse.status === 200) {
                 alert("✅ Sản phẩm đã được thêm vào giỏ hàng");
@@ -174,13 +157,27 @@ const Product = () => {
         }
     };
 
+    // USE EFFECT
+    useEffect(() => {
+        if (product) {
+            if (availableColors.length === 0) {
+                fetchColors(product.id);
+            }
+            fetchCapacities(product.id);
+            fetchProductDetails(product.id);
+        }
+    }, [product]);
 
-
-
+    const formatValue = (value) => {
+        if (value === null || value === undefined || value === "" || value === 0) {
+            return "Chưa rõ";
+        }
+        return value;
+    };
+    
     if (!product) {
         return <p className="error-message">Sản phẩm không tồn tại</p>;
     }
-
     return (
         <div>
             <Header />
@@ -253,13 +250,13 @@ const Product = () => {
                         </div>
                         <div className="product-detail-feature-list">
                             {[
-                                { icon: faTruck, text: 'Miễn phí vận chuyển toàn quốc' },
-                                { icon: faShieldAlt, text: 'Bảo hành 12 tháng chính hãng' },
-                                { icon: faSyncAlt, text: 'Bao xài đổi lỗi 30 ngày đầu' },
-                                { icon: faReceipt, text: 'Giá đã bao gồm VAT' },
+                                {icon: faTruck, text: 'Miễn phí vận chuyển toàn quốc'},
+                                {icon: faShieldAlt, text: 'Bảo hành 12 tháng chính hãng'},
+                                {icon: faSyncAlt, text: 'Bao xài đổi lỗi 30 ngày đầu'},
+                                {icon: faReceipt, text: 'Giá đã bao gồm VAT'},
                             ].map((item, index) => (
                                 <div key={index} className="feature-item">
-                                    <FontAwesomeIcon icon={item.icon} />
+                                    <FontAwesomeIcon icon={item.icon}/>
                                     <span>{item.text}</span>
                                 </div>
                             ))}
@@ -272,146 +269,68 @@ const Product = () => {
                         </div>
                         <div className="product-detail-product-specifications">
                             <h2>Thông số chi tiết</h2>
-                            {productDetails ? (
-                                <ul>
-                                    {Object.entries(productDetails).map(
-                                        ([key, value], index) => {
-                                            if (
-                                                key === 'id' ||
-                                                key === 'description' ||
-                                                key === 'createdAt' ||
-                                                key === 'updatedAt'
-                                            )
-                                                return null;
 
-                                            let vietnameseKey;
-                                            switch (key) {
-                                                case 'screen':
-                                                    vietnameseKey = 'Màn hình';
-                                                    break;
-                                                case 'frequency':
-                                                    vietnameseKey = 'Tần số';
-                                                    break;
-                                                case 'resolution':
-                                                    vietnameseKey = 'Độ phân giải';
-                                                    break;
-                                                case 'screenSize':
-                                                    vietnameseKey = 'Kích thước màn hình';
-                                                    break;
-                                                case 'screenBrightness':
-                                                    vietnameseKey = 'Độ sáng màn hình';
-                                                    break;
-                                                case 'rearCameraResolution':
-                                                    vietnameseKey = 'Độ phân giải camera sau';
-                                                    break;
-                                                case 'rearCameraFeature':
-                                                    vietnameseKey = 'Tính năng camera sau';
-                                                    break;
-                                                case 'flash':
-                                                    vietnameseKey = 'Đèn flash';
-                                                    break;
-                                                case 'frontCameraResolution':
-                                                    vietnameseKey = 'Độ phân giải camera trước';
-                                                    break;
-                                                case 'microprocessor':
-                                                    vietnameseKey = 'Vi xử lý';
-                                                    break;
-                                                case 'cpuSpeed':
-                                                    vietnameseKey = 'Tốc độ CPU';
-                                                    break;
-                                                case 'graphicsProcessor':
-                                                    vietnameseKey = 'Bộ xử lý đồ họa';
-                                                    break;
-                                                case 'operatingSystem':
-                                                    vietnameseKey = 'Hệ điều hành';
-                                                    break;
-                                                case 'externalMemoryCard':
-                                                    vietnameseKey = 'Thẻ nhớ ngoài';
-                                                    break;
-                                                case 'ram':
-                                                    vietnameseKey = 'RAM';
-                                                    break;
-                                                case 'network':
-                                                    vietnameseKey = 'Mạng';
-                                                    break;
-                                                case 'simSlot':
-                                                    vietnameseKey = 'Khe SIM';
-                                                    break;
-                                                case 'wifi':
-                                                    vietnameseKey = 'Wi-Fi';
-                                                    break;
-                                                case 'positioning':
-                                                    vietnameseKey = 'Định vị';
-                                                    break;
-                                                case 'bluetooth':
-                                                    vietnameseKey = 'Bluetooth';
-                                                    break;
-                                                case 'jackEarphone':
-                                                    vietnameseKey = 'Jack tai nghe';
-                                                    break;
-                                                case 'charger':
-                                                    vietnameseKey = 'Sạc';
-                                                    break;
-                                                case 'sensor':
-                                                    vietnameseKey = 'Cảm biến';
-                                                    break;
-                                                case 'size':
-                                                    vietnameseKey = 'Kích thước';
-                                                    break;
-                                                case 'weight':
-                                                    vietnameseKey = 'Trọng lượng';
-                                                    break;
-                                                case 'material':
-                                                    vietnameseKey = 'Chất liệu';
-                                                    break;
-                                                case 'design':
-                                                    vietnameseKey = 'Thiết kế';
-                                                    break;
-                                                case 'batteryCapacity':
-                                                    vietnameseKey = 'Dung lượng pin(mAh)';
-                                                    break;
-                                                case 'batteryTechnology':
-                                                    vietnameseKey = 'Công nghệ pin';
-                                                    break;
-                                                case 'batteryType':
-                                                    vietnameseKey = 'Loại pin';
-                                                    break;
-                                                case 'maximumCharge':
-                                                    vietnameseKey = 'Sạc tối đa';
-                                                    break;
-                                                case 'specialFeatures':
-                                                    vietnameseKey = 'Tính năng đặc biệt';
-                                                    break;
-                                                case 'security':
-                                                    vietnameseKey = 'Bảo mật';
-                                                    break;
-                                                case 'resistant':
-                                                    vietnameseKey = 'Chống nước';
-                                                    break;
-                                                case 'launchTime':
-                                                    vietnameseKey = 'Ngày ra mắt';
-                                                    break;
-                                                default:
-                                                    vietnameseKey = key;
-                                            }
+                            {!loading && productDetails && Object.keys(productDetails).length > 0 ? (
+                                <>
+                                    <p><strong>Mô tả:</strong> {productDetails.description || 'Không có'}</p>
+                                    <p><strong>Màn hình:</strong> {productDetails.screen} - {productDetails.screenSize}"
+                                        - {productDetails.resolution} - {productDetails.frequency}</p>
+                                    <p><strong>Độ sáng màn hình:</strong> {productDetails.screenBrightness}</p>
+                                    <p><strong>Camera sau:</strong> {productDetails.rearCameraResolution}</p>
+                                    <p><strong>Tính năng camera sau:</strong></p>
+                                    <div dangerouslySetInnerHTML={{__html: formatText(productDetails.rearCameraFeature)}}/>
 
-                                            return (
-                                                <li key={index}>
-                                                    <strong>{vietnameseKey}:</strong> {value}
-                                                </li>
-                                            );
-                                        }
-                                    )}
-                                </ul>
+                                    <p><strong>Camera trước:</strong> {productDetails.frontCameraResolution}</p>
+                                    <p><strong>Tính năng camera trước:</strong></p>
+                                    <div dangerouslySetInnerHTML={{__html: formatText(productDetails.frontCameraFeature)}}/>
+
+                                    <p><strong>Vi xử lý:</strong> {productDetails.microprocessor}</p>
+                                    <p><strong>Tốc độ CPU:</strong> {productDetails.cpuSpeed}</p>
+                                    <p><strong>GPU:</strong> {productDetails.graphicsProcessor}</p>
+                                    <p><strong>RAM:</strong> {productDetails.ram}</p>
+                                    <p><strong>Hệ điều hành:</strong> {productDetails.operatingSystem}</p>
+                                    <p><strong>Bộ nhớ ngoài:</strong> {productDetails.externalMemoryCard}</p>
+                                    <p><strong>NFC:</strong> {productDetails.nfc}</p>
+                                    <p><strong>Kết nối mạng:</strong> {productDetails.network}</p>
+                                    <p><strong>Khe SIM:</strong> {productDetails.simSlot}</p>
+                                    <p><strong>WiFi:</strong> {productDetails.wifi}</p>
+                                    <p><strong>Định vị:</strong></p>
+                                    <div dangerouslySetInnerHTML={{__html: formatText(productDetails.positioning)}}/>
+
+                                    <p><strong>Bluetooth:</strong> {productDetails.bluetooth}</p>
+                                    <p><strong>Jack tai nghe:</strong> {productDetails.jackEarphone}</p>
+                                    <p><strong>Cổng sạc:</strong> {productDetails.charger}</p>
+                                    <p><strong>Cảm biến:</strong></p>
+                                    <div dangerouslySetInnerHTML={{__html: formatText(productDetails.sensor)}}/>
+
+                                    <p><strong>Kích thước:</strong> {productDetails.size}</p>
+                                    <p><strong>Trọng lượng:</strong> {productDetails.weight}</p>
+                                    <p><strong>Chất liệu:</strong> {productDetails.material}</p>
+                                    <p><strong>Thiết kế:</strong> {productDetails.design}</p>
+                                    <p><strong>Pin:</strong> {productDetails.batteryCapacity}mAh ({productDetails.batteryType})</p>
+                                    <p><strong>Công nghệ pin:</strong></p>
+                                    <div dangerouslySetInnerHTML={{__html: formatText(productDetails.batteryTechnology)}}/>
+                                    <p><strong>Sạc tối đa:</strong> {productDetails.maximumCharge}</p>
+
+                                    <p><strong>Tính năng đặc biệt:</strong></p>
+                                    <div dangerouslySetInnerHTML={{__html: formatText(productDetails.specialFeatures)}}/>
+
+                                    <p><strong>Bảo mật:</strong> {productDetails.security}</p>
+                                    <p><strong>Chống nước / bụi:</strong> {productDetails.resistant}</p>
+                                </>
+                            ) : loading ? (
+                                <p>Đang tải thông tin sản phẩm...</p>
                             ) : (
-                                <p>Đang tải thông số chi tiết...</p>
+                                <p>Không có thông tin chi tiết cho sản phẩm này.</p>
                             )}
                         </div>
+
+
                     </div>
                 </div>
-                
+
             </div>
-            <Footer />
+            <Footer/>
         </div>
     );
 };

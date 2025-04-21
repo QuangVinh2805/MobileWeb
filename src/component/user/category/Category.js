@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosClient from '../../api/api';
 import './Category.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,7 +8,7 @@ const Category = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:8520/category/allCategory')
+        axiosClient.get('/category/allCategory')
             .then(response => {
                 setCategories(response.data);
             })
@@ -19,7 +19,7 @@ const Category = () => {
 
     const handleCategoryClick = async (category) => {
         try {
-            const response = await axios.get(`http://localhost:8520/product/byCategory/${category.id}`);
+            const response = await axiosClient.get(`/product/byCategory/${category.id}`);
             const products = response.data;
             // Navigate đến trang Product.js và truyền state
             navigate(`/product/${category.id}`, {
@@ -34,7 +34,7 @@ const Category = () => {
     };
 
     return (
-        <div className='aside'>
+        <div className='aside-fixed'>
             <ul>
                 {categories.map((category, index) => (
                     <li

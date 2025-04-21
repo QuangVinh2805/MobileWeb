@@ -5,7 +5,7 @@ import Header from '../header/Header';
 import Footer from '../footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
+import axiosClient from '../../api/api';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Cart = () => {
         const userId = localStorage.getItem('userId');
         if (!userId) return;
 
-        const response = await axios.get(`http://localhost:8520/cart/getCartByUser?userId=${userId}`);
+        const response = await axiosClient.get(`/cart/getCartByUser?userId=${userId}`);
         const fetchedCart = response.data.map(item => ({
           id: item.id,
           name: item.product.productName,
@@ -51,7 +51,7 @@ const Cart = () => {
     const item = updatedCart[index];
 
     try {
-      await axios.put('http://localhost:8520/cart/update', {
+      await axiosClient.put('/cart/update', {
         id: item.id,
         quantity: newQuantity,
       });
@@ -83,7 +83,7 @@ const Cart = () => {
     const itemId = cartItems[index].id;
 
     try {
-      await axios.delete(`http://localhost:8520/cart/delete/${itemId}`);
+      await axiosClient.delete(`/cart/delete/${itemId}`);
       const updatedCart = cartItems.filter((_, i) => i !== index);
       setCartItems(updatedCart);
 
@@ -97,7 +97,7 @@ const Cart = () => {
 
   const clearCart = async () => {
     try {
-      await axios.delete('http://localhost:8520/cart/deleteAll');
+      await axiosClient.delete('/cart/deleteAll');
       setCartItems([]);
       setSelectedItems({});
     } catch (error) {

@@ -4,7 +4,7 @@ import './Checkout.css';
 
 import Header from '../header/Header';
 import Footer from '../footer/Footer';
-import axios from 'axios';
+import axiosClient from '../../api/api';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ const Checkout = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(`http://localhost:8520/user/${userId}`);
+      const response = await axiosClient.get(`/user/${userId}`);
       const userData = response.data;
       setCustomerInfo({
         name: userData.name || '',
@@ -70,7 +70,7 @@ const Checkout = () => {
 
     if (input.trim().length > 2) {
       try {
-        const response = await axios.get(
+        const response = await axiosClient.get(
             `https://rsapi.goong.io/geocode?address=${input}&api_key=${import.meta.env.VITE_APP_GOONG_API_KEY}`
         );
         setAddressSuggestions(response.data.results || []);
@@ -105,7 +105,7 @@ const Checkout = () => {
         }))
       };
 
-      const response = await axios.post('http://localhost:8520/order/create', orderPayload);
+      const response = await axiosClient.post('/order/create', orderPayload);
       if (response.status === 200) {
         alert("Bạn đã đặt hàng thành công, vui lòng kiểm tra Email!");
         localStorage.removeItem('cart');

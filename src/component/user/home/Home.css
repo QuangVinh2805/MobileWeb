@@ -1,5 +1,6 @@
-/* Home.css */
 body {
+    margin: 0;
+    padding: 0;
     background-color: #f3f4f6;
     font-family: Arial, sans-serif;
 }
@@ -10,18 +11,22 @@ body {
 }
 
 main {
-    width: 85%;
-    /* Cập nhật width cho main */
+    flex: 1;
     padding: 16px;
 }
 
+.home-product {
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Căn giữa khối grid */
+}
 
 .home-product-list {
-    display: flex;
-    gap: 12px;
-    margin-top: 16px;
-    flex-wrap: wrap;
-
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    max-width: 1200px;
+    width: 100%;
 }
 
 .home-product-item {
@@ -32,9 +37,9 @@ main {
     padding: 12px;
     border-radius: 8px;
     box-shadow: 5px 5px 4px 6px rgba(0, 0, 0, 0.1);
-    width: 22%;
     height: 300px;
     position: relative;
+    width: 100%; /* Chiếm toàn bộ 1 ô của grid */
 }
 
 .home-product-item .home-image {
@@ -109,45 +114,58 @@ main {
 
 /* Responsive styles */
 @media (max-width: 1200px) {
-    .home-product-item {
-        width: calc(33.33% - 20px);
-        /* 3 sản phẩm trên mỗi hàng */
+    .home-product-list {
+        grid-template-columns: repeat(3, 1fr); /* 3 sản phẩm mỗi hàng */
+        max-width: 800px; /* thêm dòng này */
+
     }
-}
-
-@media (max-width: 768px) {
-
     .main-content {
         flex-direction: column;
     }
 
+    main {
+        width: 100%;
+    }
+}
+
+@media (max-width: 992px) {
+    .home-product-list {
+        grid-template-columns: repeat(2, 1fr); /* 2 sản phẩm mỗi hàng */
+        max-width: 640px; /* thêm dòng này */
+
+    }
 
     main {
         width: 100%;
     }
 
+    .main-content {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
     .home-product-list {
-        grid-template-columns: 1fr;
-        flex-wrap: wrap;
-        justify-content: center;
-
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 640px; /* thêm dòng này */
+        gap: 10px;
     }
 
-    .home-product-item {
-        margin: 10px;
-        width: calc(50% - 20px);
+    .main-content {
+        flex-direction: column;
     }
 
-
-    .grid {
-        grid-template-columns: repeat(4, 1fr);
+    main {
+        width: 100%;
+        padding: 10px;
     }
-
 }
 
 @media (max-width: 480px) {
-    .home-product-item {
-        width: calc(100% - 20px);
-        /* 1 sản phẩm trên mỗi hàng */
+    .home-product-list {
+        grid-template-columns: 1fr;
+        max-width: 250px; /* thêm dòng này */
+
+        gap: 15px;
     }
 }
