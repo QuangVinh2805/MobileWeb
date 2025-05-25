@@ -4,7 +4,6 @@ import { Button, Table, Modal, Form, Image, Collapse } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaDatabase } from "react-icons/fa";
 import axios from "axios";
 
 const ProductManagement = () => {
@@ -18,16 +17,23 @@ const ProductManagement = () => {
     const [selectedCapacity, setSelectedCapacity] = useState(null);
     const [productImages, setProductImages] = useState({});
     const [productPrices, setProductPrices] = useState({}); // State lưu trữ giá theo màu và dung lượng
-    const [showCapacityModal, setShowCapacityModal] = useState(false);
-    const [selectedProductIdForCapacity, setSelectedProductIdForCapacity] = useState(null);
-    const [newCapacity, setNewCapacity] = useState({ capacity: '', price: '' });
-    const [showAddColorModal, setShowAddColorModal] = useState(false);
     const [selectedProductIdForColor, setSelectedProductIdForColor] = useState(null);
-    const [selectedCapacityForColor, setSelectedCapacityForColor] = useState(null);
-    const [newColor, setNewColor] = useState({ color: '', price: '' });
     const [availableCapacities, setAvailableCapacities] = useState([]);
     const [previewImage, setPreviewImage] = useState(null);
     const [file, setFile] = useState(null);
+    const [showAddCapacityModal, setShowAddCapacityModal] = useState(false);
+    const [newCapacityInfo, setNewCapacityInfo] = useState({
+        capacity: '',
+        color: '',
+        price: ''
+    });
+    const [availableColors, setAvailableColors] = useState([]);   // lấy từ /product/color
+    const [selectedProductId, setSelectedProductId] = useState(null);
+    const [showEditCapacityModal, setShowEditCapacityModal] = useState(false);
+    const [editCapacityInfo, setEditCapacityInfo] = useState({ capacity: '', color: '', price: '' });
+    const [originalColor, setOriginalColor] = useState(''); // để giữ lại màu cũ khi cập nhật
+
+
 
 
 
@@ -384,19 +390,6 @@ const ProductManagement = () => {
                 });
         }
     };
-    const fetchCapacities = async () => {
-        if (!selectedProductIdForColor) return;
-        try {
-            const res = await axios.get("http://localhost:8520/product/capacity", {
-                params: { productId: selectedProductIdForColor }
-            });
-            setAvailableCapacities(res.data);
-        } catch (err) {
-            console.error("Lỗi khi lấy danh sách dung lượng:", err);
-            toast.error("Không thể tải danh sách dung lượng.");
-            setAvailableCapacities([]);
-        }
-    };
     useEffect(() => {
         if (selectedProductIdForColor) {
             axios.get("http://localhost:8520/product/capacity", {
@@ -410,113 +403,133 @@ const ProductManagement = () => {
     }, [selectedProductIdForColor]);
 
 
-    const handleOpenAddCapacityModal = (productId) => {
-        setSelectedProductIdForCapacity(productId);
-        setShowCapacityModal(true);
-        setNewCapacity({ capacity: '', price: '' }); // Reset form
-    };
-
-    const handleCloseCapacityModal = () => {
-        setShowCapacityModal(false);
-        setSelectedProductIdForCapacity(null);
-    };
-
-    const handleAddCapacity = () => {
-        if (!selectedProductIdForCapacity) return;
-        if (!newCapacity.capacity.trim()) {
-            alert("Vui lòng nhập dung lượng.");
-            return;
-        }
-
-        axios.post(`http://localhost:8520/product/capacity/create/noColor?productId=${selectedProductIdForCapacity}`, newCapacity)
-            .then(res => {
-                console.log("Thêm dung lượng thành công:", res.data);
-                toast.success(`Đã thêm dung lượng '${newCapacity.capacity}' thành công!`);
-                // Cập nhật lại danh sách dung lượng cho sản phẩm
-                axios.get("http://localhost:8520/product/capacity", {
-                    params: { productId: selectedProductIdForCapacity }
-                })
-                    .then(res => {
-                        setProductCapacities(prev => ({
-                            ...prev,
-                            [selectedProductIdForCapacity]: res.data
-                        }));
-                    })
-                    .catch(err => {
-                        console.error("Lỗi khi lấy lại dung lượng sau khi thêm:", err);
-                    });
-                handleCloseCapacityModal();
-            })
-            .catch(err => {
-                console.error("Lỗi khi thêm dung lượng:", err);
-                toast.error(err.response?.data?.message || "Có lỗi khi thêm dung lượng.");
-            });
-    };
-
-    const handleOpenAddColorModal = async (productId) => {
-        setSelectedProductIdForColor(productId);
-        setSelectedCapacityForColor('');
-        setNewColor({ color: '', price: '' });
-        setShowAddColorModal(true);
+    const openAddCapacityModal = async (productId) => {
+        setSelectedProductId(productId);
+        setNewCapacityInfo({ capacity: '', color: '', price: '' });
+        setShowAddCapacityModal(true);
 
         try {
-            const res = await axios.get("http://localhost:8520/product/capacity", {
-                params: { productId }
-            });
-            setAvailableCapacities(res.data);
-        } catch (err) {
-            console.error("Lỗi khi lấy danh sách dung lượng:", err);
-            toast.error("Không thể tải danh sách dung lượng.");
-            setAvailableCapacities([]);
+            const res = await axios.get('http://localhost:8520/product/color');
+            setAvailableColors(res.data);                // [{id, color}, ...]
+        } catch (e) {
+            toast.error('Không thể tải danh sách màu.');
+            setAvailableColors([]);
         }
     };
 
-
-    const handleCloseAddColorModal = () => {
-        setShowAddColorModal(false);
-        setSelectedProductIdForColor(null);
-        setSelectedCapacityForColor(null);
-        setNewColor({ color: '', price: '' });
+    const closeAddCapacityModal = () => {
+        setShowAddCapacityModal(false);
+        setSelectedProductId(null);
     };
 
-    const handleAddColor = () => {
-        if (!selectedProductIdForColor || !selectedCapacityForColor) {
-            alert("Vui lòng chọn dung lượng.");
+    const openUpdateCapacityModal = (productId, capacity, color, price) => {
+        if (!color || color.trim() === '') {
+            toast.error('Vui lòng chọn màu trước khi chỉnh sửa');
             return;
         }
-        if (!newColor.color.trim()) {
-            alert("Vui lòng nhập màu sắc.");
+        setSelectedProductId(productId);
+        setEditCapacityInfo({ capacity, color, price });
+        setOriginalColor(color);
+        setShowEditCapacityModal(true);
+    };
+
+    const closeEditCapacityModal = () => {
+        setShowEditCapacityModal(false);
+        setSelectedProductId(null);
+        setEditCapacityInfo({ capacity: '', color: '', price: '' });
+    };
+
+
+
+    const handleAddCapacityWithColor = () => {
+        if (!selectedProductId) return;
+
+        const { capacity, color, price } = newCapacityInfo;
+        if (!capacity.trim() || !color) {
+            alert('Vui lòng nhập đầy đủ dung lượng và chọn màu.');
             return;
         }
 
         axios.post(
-            `http://localhost:8520/product/color/create?productId=${selectedProductIdForColor}&capacity=${selectedCapacityForColor}`,
-            newColor
+            `http://localhost:8520/product/capacity/create`,
+            { capacity: capacity.trim(), color, price: price ? Number(price) : 0 },
+            { params: { productId: selectedProductId } }
         )
             .then(res => {
-                toast.success(`Đã thêm màu '${newColor.color}' cho dung lượng '${selectedCapacityForColor}'!`);
-                // Cập nhật lại danh sách màu
-                axios.get("http://localhost:8520/product/image/colors", {
-                    params: { productId: selectedProductIdForColor }
-                })
-                    .then(res => {
-                        setProductColors(prev => ({
-                            ...prev,
-                            [selectedProductIdForColor]: res.data
-                        }));
-                    });
-                fetchProductPrice(
-                    selectedProductIdForColor,
-                    newColor.color.toLowerCase(),
-                    selectedCapacityForColor
-                );
-                handleCloseAddColorModal();
+                toast.success('Đã thêm dung lượng / màu thành công!');
+                // reload capacities & colors list tuỳ logic cũ
+                reloadCapacitiesAndColors(selectedProductId);
+                closeAddCapacityModal();
             })
             .catch(err => {
-                console.error("Lỗi khi thêm màu sắc:", err);
-                toast.error(err.response?.data?.message || "Có lỗi khi thêm màu sắc.");
+                toast.error(err.response?.data?.message || 'Có lỗi khi thêm.');
             });
     };
+
+    const reloadCapacitiesAndColors = (productId) => {
+        axios.get('http://localhost:8520/product/capacity', { params: { productId } })
+            .then(res => setProductCapacities(p => ({ ...p, [productId]: res.data })));
+
+        axios.get('http://localhost:8520/product/image/colors', { params: { productId } })
+            .then(res => setProductColors(p => ({ ...p, [productId]: res.data })));
+    };
+
+    const handleUpdateCapacity = () => {
+        const { capacity, color, price } = editCapacityInfo;
+
+        if (!selectedProductId || !capacity.trim() || !color.trim()) {
+            toast.error('Vui lòng nhập đầy đủ thông tin.');
+            return;
+        }
+        if (!originalColor || originalColor.trim() === '') {
+            toast.error('Màu cũ không được để trống');
+            return;
+        }
+
+        console.log('Sending updateCapacity payload:', {
+            oldColor: originalColor.trim(),
+            oldCapacity: capacity.trim(),
+            newColor: color.trim(),
+            newCapacity: capacity.trim(),
+            price: price ? Number(price) : 0,
+        });
+
+        axios.put('http://localhost:8520/product/capacity/update', {
+            oldColor: originalColor.trim(),
+            oldCapacity: capacity.trim(),
+            newColor: color.trim(),
+            newCapacity: capacity.trim(),
+            price: price ? Number(price) : 0
+        }, {
+            params: { productId: selectedProductId }
+        })
+            .then(() => {
+                toast.success('Cập nhật thành công!');
+                reloadCapacitiesAndColors(selectedProductId);
+                closeEditCapacityModal();
+            })
+            .catch(err => {
+                toast.error(err.response?.data?.message || 'Có lỗi khi cập nhật.');
+            });
+    };
+
+
+    const handleDeleteCapacity = (productId, capacity) => {
+        if (!window.confirm(`Xác nhận xoá tất cả màu với dung lượng "${capacity}"?`)) return;
+
+        axios.delete(`http://localhost:8520/product/capacity/delete`, {
+            params: { productId },
+            data: { capacity }
+        })
+            .then(() => {
+                toast.success('Đã xoá thành công!');
+                reloadCapacitiesAndColors(productId);
+            })
+            .catch(err => {
+                toast.error(err.response?.data?.message || 'Có lỗi khi xoá.');
+            });
+    };
+
 
 
     const handleUploadImage = async () => {
@@ -530,19 +543,15 @@ const ProductManagement = () => {
             return;
         }
 
-        const imageUrl = URL.createObjectURL(file); // dùng tạm giống avatar
-
-        const payload = {
-            productId: selectedProductIdForColor,
-            color: selectedColor,
-            image: imageUrl,
-        };
+        const formData = new FormData();
+        formData.append("productId", selectedProductIdForColor);
+        formData.append("color", selectedColor);
+        formData.append("file", file); // File thực
 
         try {
             const res = await fetch("http://localhost:8520/product/image/create", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
+                body: formData,
             });
 
             if (!res.ok) throw new Error("Upload ảnh thất bại");
@@ -550,7 +559,7 @@ const ProductManagement = () => {
             const data = await res.json();
             alert("Upload ảnh thành công!");
 
-            // Sau khi upload thành công, cập nhật danh sách ảnh
+            // Cập nhật danh sách ảnh
             fetchProductImages(selectedProductIdForColor, selectedColor);
 
             // Reset lại file & preview
@@ -561,6 +570,53 @@ const ProductManagement = () => {
             alert(error.message || "Lỗi upload ảnh");
         }
     };
+
+    const handleUpdateImage = async (imageId, newFile) => {
+        if (!newFile) {
+            alert("Vui lòng chọn ảnh mới trước khi cập nhật.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", newFile);
+
+        try {
+            const res = await axios.put(`http://localhost:8520/product/image/update`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                params: {
+                    id: imageId,
+                },
+            });
+
+            toast.success("Cập nhật ảnh thành công!");
+            // Gọi lại fetch để cập nhật danh sách ảnh mới (ví dụ fetchProductImages)
+            fetchProductImages(selectedProductIdForColor, selectedColor);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Cập nhật ảnh thất bại.");
+        }
+    };
+
+
+    const handleDeleteImage = async (imageId) => {
+        if (!window.confirm("Bạn có chắc muốn xóa ảnh này không?")) return;
+
+        try {
+            await axios.delete(`http://localhost:8520/product/image/delete`, {
+                params: { id: imageId },
+            });
+
+            toast.success("Xóa ảnh thành công!");
+            // Cập nhật lại danh sách ảnh sau khi xóa
+            fetchProductImages(selectedProductIdForColor, selectedColor);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Xóa ảnh thất bại.");
+        }
+    };
+
+    
+
 
     const filteredProducts = products.filter((product) => {
         const productName = product.productName || "";
@@ -669,33 +725,62 @@ const ProductManagement = () => {
                         {expandedProduct?.productId === product.id && productCapacities[product.id] && (
                             <tr>
                                 <td colSpan="5">
-                                <strong>Dung lượng:</strong>{" "}
+                                    <strong>Dung lượng:</strong>{" "}
                                     {productCapacities[product.id].map((capacity, idx) => (
-                                        <Button
-                                            key={idx}
-                                            variant={selectedCapacity === capacity ? "primary" : "outline-secondary"}
-                                            className="me-2 mb-2"
-                                            size="sm"
-                                            onClick={() => {
-                                                setSelectedCapacity(capacity);
-                                                if (selectedColor) {
-                                                    fetchProductPrice(expandedProduct.productId, selectedColor, capacity);
-                                                }
-                                            }}
-                                        >
-                                            {capacity}
-                                        </Button>
+                                        <div key={idx} className="d-inline-block me-2 mb-2">
+                                            <Button
+                                                variant={selectedCapacity === capacity ? "primary" : "outline-secondary"}
+                                                size="sm"
+                                                onClick={() => {
+                                                    setSelectedCapacity(capacity);
+                                                    if (selectedColor) {
+                                                        fetchProductPrice(expandedProduct.productId, selectedColor, capacity);
+                                                    }
+                                                }}
+                                            >
+                                                {capacity}
+                                            </Button>
+
+                                            <Button
+                                                variant="warning"
+                                                size="sm"
+                                                className="ms-1"
+                                                onClick={() => {
+                                                    if (!selectedColor || selectedColor.trim() === '') {
+                                                        toast.error('Vui lòng chọn màu trước khi chỉnh sửa');
+                                                        return;
+                                                    }
+                                                    openUpdateCapacityModal(product.id, capacity, selectedColor, 0);
+                                                }}
+                                            >
+                                                ✏
+                                            </Button>
+
+
+                                            <Button
+                                                variant="danger"
+                                                size="sm"
+                                                className="ms-1"
+                                                onClick={() => handleDeleteCapacity(product.id, capacity)}
+                                            >
+                                                🗑
+                                            </Button>
+
+                                        </div>
                                     ))}
+
                                     {expandedProduct?.productId === product.id && (
                                         <Button
                                             variant="outline-success"
                                             size="sm"
                                             className="ms-2"
-                                            onClick={() => handleOpenAddCapacityModal(product.id)}
+                                            onClick={() => openAddCapacityModal(product.id)}
                                         >
                                             Thêm dung lượng
                                         </Button>
+
                                     )}
+
                                 </td>
                             </tr>
                         )}
@@ -723,36 +808,50 @@ const ProductManagement = () => {
                                             {colorObj.color}
                                         </Button>
                                     ))}
-
-                                    {expandedProduct?.productId === product.id && (
-                                        <Button
-                                            variant="outline-info"
-                                            size="sm"
-                                            className="ms-2 mb-2"
-                                            onClick={() => handleOpenAddColorModal(product.id)}
-                                        >
-                                            Thêm màu
-                                        </Button>
-                                    )}
                                 </td>
                             </tr>
                         )}
-                        {expandedProduct?.productId === product.id && productImages[product.id]?.length > 0 && (
+                        {expandedProduct?.productId === product.id && (
                             <tr>
                                 <td colSpan="5">
                                     <strong>Hình ảnh:</strong>
                                     <div className="d-flex flex-wrap">
-                                        {productImages[product.id].map((image, idx) => (
-                                            <Image
-                                                key={idx}
-                                                src={image.image || "https://via.placeholder.com/100"}
-                                                alt={`Hình ảnh ${idx + 1}`}
-                                                width={100}
-                                                objectFit={"cover"}
-                                                className="me-2 mb-2"
-                                                rounded
-                                            />
-                                        ))}
+                                        {/* Hiển thị hình ảnh nếu có */}
+                                        {productImages[product.id]?.length > 0 &&
+                                            productImages[product.id].map((image, idx) => (
+                                                <div key={idx} className="position-relative me-2 mb-2">
+                                                    <Image
+                                                        src={`http://localhost:8520${image.image}`}
+                                                        alt={`Hình ảnh ${idx + 1}`}
+                                                        width={100}
+                                                        objectFit={"cover"}
+                                                        rounded
+                                                    />
+                                                    <input
+                                                        type="file"
+                                                        style={{ position: "absolute", top: 0, left: 0, width: 100, height: 100, opacity: 0, cursor: "pointer" }}
+                                                        onChange={(e) => {
+                                                            const newFile = e.target.files[0];
+                                                            if (newFile) {
+                                                                handleUpdateImage(image.id, newFile);
+                                                            }
+                                                        }}
+                                                    />
+                                                    <Button
+                                                        variant="danger"
+                                                        size="sm"
+                                                        style={{ position: "absolute", top: 0, right: 0 }}
+                                                        onClick={() => handleDeleteImage(image.id)}
+                                                    >
+                                                        🗑
+                                                    </Button>
+                                                </div>
+                                            ))}
+
+
+
+
+                                        {/* Form thêm ảnh luôn hiển thị */}
                                         <Form.Group className="col-md-6 mb-3">
                                             <Form.Label>Thêm ảnh sản phẩm</Form.Label>
                                             <Form.Control
@@ -783,6 +882,7 @@ const ProductManagement = () => {
                                 </td>
                             </tr>
                         )}
+
                         {expandedProduct?.productId === product.id && expandedProduct.details && (
                             <tr>
                                 <td colSpan="5">
@@ -803,10 +903,10 @@ const ProductManagement = () => {
                 ))}
                 </tbody>
             </Table>
-            {/* Modal Thêm Dung lượng */}
-            <Modal show={showCapacityModal} onHide={handleCloseCapacityModal}>
+            {/* Modal Thêm Dung lượng + Màu */}
+            <Modal show={showAddCapacityModal} onHide={closeAddCapacityModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Thêm Dung lượng</Modal.Title>
+                    <Modal.Title>Thêm Dung lượng & Màu</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
@@ -814,82 +914,91 @@ const ProductManagement = () => {
                             <Form.Label>Dung lượng</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Nhập dung lượng (ví dụ: 64GB)"
-                                value={newCapacity.capacity}
-                                onChange={(e) => setNewCapacity({ ...newCapacity, capacity: e.target.value })}
+                                placeholder="Ví dụ: 128GB"
+                                value={newCapacityInfo.capacity}
+                                onChange={e => setNewCapacityInfo({ ...newCapacityInfo, capacity: e.target.value })}
                             />
                         </Form.Group>
+
                         <Form.Group className="mb-3">
-                            <Form.Label>Giá</Form.Label>
-                            <Form.Control
-                                type="number"
-                                placeholder="Nhập giá cho dung lượng này"
-                                value={newCapacity.price}
-                                onChange={(e) => setNewCapacity({ ...newCapacity, price: e.target.value ? parseInt(e.target.value) : '' })}
-                            />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseCapacityModal}>
-                        Đóng
-                    </Button>
-                    <Button variant="primary" onClick={handleAddCapacity}>
-                        Thêm
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-            <Modal show={showAddColorModal} onHide={handleCloseAddColorModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Thêm Màu Sắc</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Chọn Dung Lượng</Form.Label>
+                            <Form.Label>Chọn Màu</Form.Label>
                             <Form.Select
-                                value={selectedCapacityForColor || ''}
-                                onChange={(e) => setSelectedCapacityForColor(e.target.value)}
+                                value={newCapacityInfo.color}
+                                onChange={e => setNewCapacityInfo({ ...newCapacityInfo, color: e.target.value })}
                             >
-                                <option value="">-- Chọn dung lượng --</option>
-                                {availableCapacities.map((cap, idx) => (
-                                    <option key={idx} value={cap}>
-                                        {cap}
-                                    </option>
+                                <option value="">-- Chọn màu --</option>
+                                {availableColors.map(c => (
+                                    <option key={c.id} value={c.color}>{c.color}</option>
                                 ))}
                             </Form.Select>
                         </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Màu sắc</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Nhập tên màu (ví dụ: Đỏ)"
-                                value={newColor.color}
-                                onChange={(e) => setNewColor({ ...newColor, color: e.target.value })}
-                            />
-                        </Form.Group>
+
                         <Form.Group className="mb-3">
                             <Form.Label>Giá</Form.Label>
                             <Form.Control
                                 type="number"
-                                placeholder="Nhập giá cho màu này"
-                                value={newColor.price}
-                                onChange={(e) =>
-                                    setNewColor({ ...newColor, price: e.target.value ? parseInt(e.target.value) : '' })
+                                placeholder="Nhập giá"
+                                value={newCapacityInfo.price}
+                                onChange={e =>
+                                    setNewCapacityInfo({ ...newCapacityInfo, price: e.target.value ? parseInt(e.target.value) : '' })
                                 }
                             />
                         </Form.Group>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseAddColorModal}>
+                    <Button variant="secondary" onClick={closeAddCapacityModal}>
                         Đóng
                     </Button>
-                    <Button variant="primary" onClick={handleAddColor}>
+                    <Button variant="primary" onClick={handleAddCapacityWithColor}>
                         Thêm
                     </Button>
                 </Modal.Footer>
             </Modal>
+            <Modal show={showEditCapacityModal} onHide={closeEditCapacityModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Cập nhật dung lượng</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Dung lượng</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={editCapacityInfo.capacity}
+                                onChange={(e) => setEditCapacityInfo({ ...editCapacityInfo, capacity: e.target.value })}
+                                disabled
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Màu</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={editCapacityInfo.color}
+                                onChange={(e) => setEditCapacityInfo({ ...editCapacityInfo, color: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Giá</Form.Label>
+                            <Form.Control
+                                type="number"
+                                value={editCapacityInfo.price}
+                                onChange={(e) => setEditCapacityInfo({ ...editCapacityInfo, price: e.target.value })}
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={closeEditCapacityModal}>
+                        Hủy
+                    </Button>
+                    <Button variant="primary" onClick={handleUpdateCapacity}>
+                        Cập nhật
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+
             <Modal show={showModal} onHide={() => {
                 setShowModal(false);
                 setNewProduct({
